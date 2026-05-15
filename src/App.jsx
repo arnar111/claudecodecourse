@@ -13,7 +13,7 @@ const MODULES = [
         title: "Hvað er Claude Code?",
         type: "read",
         xp: 10,
-        content: `Claude Code er AI verkfæri sem lifir í terminal-inum þínum. Þetta er **ekki** venjuleg spjallforrit — þetta er agent sem getur:
+        content: `Claude Code er AI verkfæri sem lifir í terminal-inum þínum. Þetta er **ekki** venjulegt spjallforrit — þetta er agent sem getur:
 
 - Lesið og breytt skrám
 - Keyrt bash skipanir
@@ -21,7 +21,7 @@ const MODULES = [
 - Unnið með Git
 - Kallað á MCP servers (ytri þjónustur)
 
-Hugsuðu þér það eins og að hafa mjög hæfan forritara sem situr við hliðina á þér, sér allt sem þú sérð, og getur gert hlutina sjálfur.
+Hugsaðu þér það eins og að hafa mjög hæfan forritara sem situr við hliðina á þér, sér allt sem þú sérð, og getur gert hlutina sjálfur.
 
 **Hvernig er þetta öðruvísi en claude.ai?**
 claude.ai er spjall. Claude Code er **agent** — hann getur tekið aðgerðir, ekki bara svarað spurningum.`,
@@ -32,9 +32,9 @@ claude.ai er spjall. Claude Code er **agent** — hann getur tekið aðgerðir, 
         title: "CLAUDE.md — Minni Claudes",
         type: "read",
         xp: 15,
-        content: `CLAUDE.md er eins og að kynna Claude fyrir verkefnið þitt í upphafi hvers session.
+        content: `CLAUDE.md er eins og að kynna Claude fyrir verkefninu þínu í upphafi hverrar lotu.
 
-**Mikilvægasta reglan:** Claude man ekkert á milli sessions. Þetta skjal er það eina sem heldur samhenginu.
+**Mikilvægasta reglan:** Claude man ekkert á milli lota. Þetta skjal er það eina sem heldur samhenginu.
 
 **Hvar má setja CLAUDE.md:**
 - \`~/.claude/CLAUDE.md\` — gildir fyrir öll verkefni
@@ -116,8 +116,8 @@ src/
         xp: 10,
         content: `Claude Code kemur með 60+ innbyggðar skipanir. Þær mikilvægustu:
 
-**Session stjórnun:**
-- \`/clear\` — hreinsar samtal (mikilvægt! context drekknar)
+**Lotustjórnun:**
+- \`/clear\` — hreinsar samtal (mikilvægt! context drukknar)
 - \`/compact\` — þjappar saman löngu samtali
 - \`/context\` — sér hversu mikið context er notað
 
@@ -127,11 +127,11 @@ src/
 - \`/model\` — skiptir um model (Opus fyrir planning, Sonnet fyrir kóða)
 
 **Vinnu flow:**
-- \`/branch\` — greinir samtal í nýja session (fyrr: /fork)
+- \`/branch\` — greinir samtal í nýja lotu (fyrr: /fork)
 - \`/hooks\` — setur upp hooks með viðmóti
 - \`/review\` — kóðayfirlestur
 
-**💡 ADHD tip:** \`/compact\` þegar þú finnur að Claude er farinn að gleymast eða endurtaka sig.`,
+**💡 ADHD tip:** \`/compact\` þegar þú finnur að Claude er farinn að gleyma og endurtaka sig.`,
         challenge: null,
       },
       {
@@ -207,7 +207,7 @@ Biddu notanda um staðfestingu áður en þú committar.`,
         title: "Context er allt",
         type: "read",
         xp: 15,
-        content: `Claude Code hefur ekkert minni á milli sessions. Allt sem þú vilt að hann viti þarf að vera í context-inum.
+        content: `Claude Code hefur ekkert minni á milli lota. Allt sem þú vilt að hann viti þarf að vera í context-inum.
 
 **Hvernig context safnast:**
 1. CLAUDE.md (alltaf)
@@ -215,8 +215,8 @@ Biddu notanda um staðfestingu áður en þú committar.`,
 3. Samtalssaga
 4. Skrár sem þú @-nefnir
 
-**Vandinn: Context drekknar**
-Eftir langa session byrjar Claude að:
+**Vandinn: Context drukknar**
+Eftir langa lotu byrjar Claude að:
 - Gleyma fyrstu leiðbeiningum
 - Endurtaka sig
 - Hunsa CLAUDE.md reglur
@@ -224,7 +224,7 @@ Eftir langa session byrjar Claude að:
 **Lausnir:**
 - \`/clear\` — byrja upp á nýtt
 - \`/compact\` — þjappa saman án þess að missa samhengi
-- \`/branch\` — greina í nýja session fyrir nýtt verkefni
+- \`/branch\` — greina í nýja lotu fyrir nýtt verkefni
 
 > 🎯 Regla: Ef Claude er farinn að gera villur sem hann gerði ekki áðan — hreinsa context!`,
         challenge: null,
@@ -386,7 +386,7 @@ Klára þessar þrjár features samhliða:
 - Agent 3: Uppfærðu documentation
 \`\`\`
 
-**Mikilvægt:** Hvert agent þarf sitt eigið directory til að vera óháð. Þetta líkist mjög OpenClaw uppbyggingunni þinni!
+**Mikilvægt:** Hvert agent þarf sína eigin möppu til að vera óháð. Þetta líkist mjög OpenClaw uppbyggingunni þinni!
 
 **Hvenær á að nota:**
 - Stórar features sem snerta mismunandi hluta kóðabasis
@@ -668,7 +668,10 @@ export default function App() {
 Gefðu skýrar, praktískar leiðbeiningar.
 Notaðu kóðablokkir þar sem við á.
 Vertu hvetjandi en nákvæmur.
-Svaraðu á íslensku.`,
+Svaraðu á vel mótaðri, málfræðilega réttri íslensku.
+Stíll: Dev-jargon haldist á ensku (hooks, skills, agents, commit, MCP, terminal),
+en notaðu íslensk orð fyrir "session" (lota) og "directory" (mappa).
+Forðastu málfræðivillur eins og "drekknar" (rétt: drukknar) og notaðu rétta beygingu fallorða.`,
         userContent: challengeInput,
       });
       setAiResponse(text);
@@ -828,7 +831,7 @@ ${mdRules}`,
               />
             </div>
             <Btn onClick={generateClaudeMd} disabled={mdLoading}>
-              {mdLoading ? "Sé að smíða..." : "⚡ Búa til CLAUDE.md"}
+              {mdLoading ? "Er að smíða..." : "⚡ Búa til CLAUDE.md"}
             </Btn>
             {mdError && (
               <div className="mt-4 bg-red-50 border border-red-200 text-red-800 rounded-lg px-3.5 py-2.5 text-sm">
@@ -1001,7 +1004,7 @@ ${mdRules}`,
                       onClick={askAI}
                       disabled={aiLoading || !challengeInput.trim()}
                     >
-                      {aiLoading ? "Sé að spyrja..." : "⚡ Spyrja AI kennara"}
+                      {aiLoading ? "Er að spyrja..." : "⚡ Spyrja AI kennara"}
                     </Btn>
                     {!isDone && (
                       <Btn variant="success" onClick={markDone}>

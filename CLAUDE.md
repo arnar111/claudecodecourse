@@ -95,10 +95,38 @@ Við notum einfalt custom renderer (í `renderContent` fallinu). Studdar setning
 
 **Mikilvægt:** Renderer er einlægur — ekki nota flókin Markdown. Ef þú þarft meira: bættu við render logic í `renderContent` fallið.
 
-### Íslenska
+### Íslenska — stíll og hugtök
+
+**Almennt:**
 - **Allt efni á íslensku** — titlar, leiðbeiningar, villuboð, XP celebration
-- Tæknileg orð (hooks, skills, agents, commit) eru á ensku eins og þau eru
-- System prompt í API köllum er á íslensku
+- **System prompt** í API köllum er á íslensku með stílleiðbeiningum
+- Markmiðið er gæði á við [Icelandic Language Technology Programme](https://github.com/icelandic-lt/icelandic-lt) — engar Google-Translate-villur
+
+**Orðskrá — hvenær á að þýða og hvenær á að halda ensku:**
+
+| Hugtak | Stíll | Athugasemd |
+|--------|-------|------------|
+| hook, skill, agent, commit, MCP, PR, branch, diff | enska | Dev-jargon, óstefnt í íslensku |
+| terminal | enska | Mest notað hugtak hjá íslenskum forriturum |
+| secrets, manager | enska | Tæknileg dev-jargon |
+| **session(s)** | **lota / lotur** | Beygist (kvk.): lota, lotu, lotu, lotu; ft. lotur, lotur, lotum, lota |
+| **directory** | **mappa** | Algengt og vel skilið íslenskt orð |
+
+**Algengar villur sem ber að forðast:**
+
+| Villa | Rétt | Skýring |
+|-------|------|---------|
+| `Sé að spyrja...` | `Er að spyrja...` | "sé" er viðtengingarháttur |
+| `venjuleg spjallforrit` (et.) | `venjulegt spjallforrit` | "forrit" er hvorugkyn |
+| `Hugsuðu þér` | `Hugsaðu þér` | Boðháttur af _hugsa_ |
+| `kynna fyrir verkefnið` | `kynna fyrir verkefninu` | Þágufall eftir _fyrir_ |
+| `context drekknar` | `context drukknar` | Sögnin er _drukkna_, ekki _drekkna_ |
+| `Claude er farinn að gleymast` | `Claude er farinn að gleyma` | Active, ekki passive |
+
+**Áður en nýtt efni er bætt við:**
+- Lestu yfir í gegnum textann eins og íslenskur prófarkalesari
+- Athugaðu kyn, fall og tölu á öllum fallorðum
+- Spurðu: er hér anglikismi sem á sér góða íslenska þýðingu?
 
 ---
 
