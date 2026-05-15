@@ -15,25 +15,33 @@
 ## Tæknileg uppbygging
 
 ### Stack
-- **Framework:** React 18 með hooks (useState, useEffect, useRef)
-- **Stíll:** High end CSS og Tailwind - desktop/mobile mismunandi UI
-- **API:** Anthropic Messages API (`claude-sonnet-4-20250514`)
+- **Framework:** React 18 með hooks (useState, useRef)
+- **Build tool:** Vite 6
+- **Stíll:** Tailwind CSS v4 (`@tailwindcss/vite`) — responsive desktop/mobile
+- **API:** Anthropic Messages API (`claude-sonnet-4-20250514`) gegnum Vite proxy
 - **Geymsla:** localStorage fyrir XP og framvindu
-- **Þjónustuveri:** Ekkert — allt keyrir client-side
+- **Þjónustuveri:** Vite dev server með proxy fyrir API (API lykill aldrei í vafra)
 
 ### Skráauppbygging
 ```
 claude-code-namskeid/
-├── claude-code-namskeid.jsx   # Aðalskrá — allt í einni skrá í bili
-├── CLAUDE.md                  # Þessi skrá
-└── README.md                  # Uppsetningarleiðbeiningar (ef við á)
+├── index.html              # Vite entry
+├── package.json
+├── vite.config.js          # Vite + Tailwind + /api/messages proxy
+├── .env.example            # Sniðmát (notandi býr til .env)
+├── .gitignore
+├── CLAUDE.md               # Þessi skrá
+├── README.md               # Uppsetningarleiðbeiningar
+└── src/
+    ├── main.jsx            # React entry
+    ├── App.jsx             # Aðalapp (allt í einni skrá enn sem komið er)
+    └── index.css           # Tailwind + animations
 ```
 
 ### Einlægni (Single File Approach)
-Á þessum stigi er **allt í einni jsx skrá**. Þetta er meðvitað val:
-- Auðveldara að deila og keyra sem artifact
+Á þessum stigi er **öll React-rökrétta í `src/App.jsx`**. Þetta er meðvitað val:
 - Fær grunninn til að virka áður en við brjótum upp
-- Þegar við förum í SaaS: brjóta upp í components/, hooks/, data/
+- Þegar við förum í SaaS (Phase 2+): brjóta upp í components/, hooks/, data/
 
 ---
 
@@ -98,18 +106,15 @@ Við notum einfalt custom renderer (í `renderContent` fallinu). Studdar setning
 
 ### Keyra verkefnið
 ```bash
-# Þetta er React artifact — keyrir beint í Claude.ai artifact viewer
-# Til að keyra locally:
-npx create-react-app temp-test
-cp claude-code-namskeid.jsx temp-test/src/App.jsx
-cd temp-test && npm start
+npm install
+cp .env.example .env   # bæta inn ANTHROPIC_API_KEY
+npm run dev            # http://localhost:5173
 ```
 
-### Þegar við förum í SaaS (síðar)
+### Build
 ```bash
-npm create vite@latest claude-code-is -- --template react-ts
-npm install
-npm run dev
+npm run build      # → dist/
+npm run preview    # Skoða byggt
 ```
 
 ---
@@ -117,8 +122,10 @@ npm run dev
 ## API notkun
 
 ### Anthropic API kall — staðlað snið
+Frá vafranum köllum við **relative URL** (`/api/messages`). Vite proxy bætir við `x-api-key` og `anthropic-version` headers úr `.env`. API lykillinn fer aldrei til vafrans.
+
 ```js
-const resp = await fetch("https://api.anthropic.com/v1/messages", {
+const resp = await fetch("/api/messages", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
@@ -128,13 +135,17 @@ const resp = await fetch("https://api.anthropic.com/v1/messages", {
     messages: [{ role: "user", content: userInput }],
   }),
 });
+if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 const data = await resp.json();
 const text = data.content?.find(b => b.type === "text")?.text || "";
 ```
 
+Hjálparfall `callAnthropic({ system, userContent })` í `src/App.jsx` sér um þetta.
+
 ### API villur
-- **Alltaf** wrap-a í try/catch
+- **Alltaf** wrap-a í try/catch og athuga `resp.ok`
 - Birta notendavæg villuboð á íslensku
+- Sérstakt villuboð fyrir 401 / vantar API lykil
 - Ekki sýna tæknilegar villuskilaboð beint
 
 ---
