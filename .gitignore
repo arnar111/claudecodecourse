@@ -1,0 +1,25 @@
+node_modules
+dist
+dist-ssr
+.vite
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Local Claude stillingar
+.claude/settings.local.json
+CLAUDE.local.md
+
+# Editor
+.vscode
+.idea
+*.swp
+.DS_Store
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
