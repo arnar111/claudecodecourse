@@ -15,17 +15,18 @@
 ## Tæknileg uppbygging
 
 ### Stack
-- **Framework:** React 18 með hooks (useState, useRef)
+- **Framework:** React 18 með hooks (useState, useRef, useEffect)
 - **Build tool:** Vite 6
-- **Stíll:** Tailwind CSS v4 (`@tailwindcss/vite`) — responsive desktop/mobile
+- **Stíll:** Tailwind CSS v4 (`@tailwindcss/vite`) fyrir base, inline `<style>` template literal í `App.jsx` fyrir dynamic palette/theme styles
+- **Letur:** Space Grotesk (body), VT323 (accents/counters), JetBrains Mono (code) frá Google Fonts
 - **API:** Anthropic Messages API (`claude-sonnet-4-20250514`) gegnum Vite proxy
-- **Geymsla:** localStorage fyrir XP og framvindu
+- **Geymsla:** localStorage fyrir XP, framvindu, streak, class, tweaks
 - **Þjónustuveri:** Vite dev server með proxy fyrir API (API lykill aldrei í vafra)
 
 ### Skráauppbygging
 ```
 claude-code-namskeid/
-├── index.html              # Vite entry
+├── index.html              # Vite entry + Google Fonts
 ├── package.json
 ├── vite.config.js          # Vite + Tailwind + /api/messages proxy
 ├── .env.example            # Sniðmát (notandi býr til .env)
@@ -34,14 +35,37 @@ claude-code-namskeid/
 ├── README.md               # Uppsetningarleiðbeiningar
 └── src/
     ├── main.jsx            # React entry
-    ├── App.jsx             # Aðalapp (allt í einni skrá enn sem komið er)
-    └── index.css           # Tailwind + animations
+    ├── App.jsx             # Aðalapp — router + screens + inline styles
+    ├── index.css           # Tailwind + base fonts
+    ├── data/
+    │   ├── modules.js      # MODULES array með lesson content
+    │   └── classes.js      # CLASSES — 4 pixel-art persónugerðir með buffs
+    ├── lib/
+    │   ├── theme.js        # getPalette({dark, warmth}) — 6 paletta
+    │   └── api.js          # callAnthropic + system prompts
+    └── components/
+        └── Icons.jsx       # I (SVG iconset) + moduleIcons + PixelChar
 ```
 
-### Einlægni (Single File Approach)
-Á þessum stigi er **öll React-rökrétta í `src/App.jsx`**. Þetta er meðvitað val:
-- Fær grunninn til að virka áður en við brjótum upp
-- Þegar við förum í SaaS (Phase 2+): brjóta upp í components/, hooks/, data/
+### Útlit — "Arcade Soft" hönnun
+ADHD-vinsamleg gamification: pixel-art persónugerðir með buffs, soft sunset palette, combo bursts, og Tweaks panel (Intensity/Motion/Warmth).
+
+**Persónugerðir (`src/data/classes.js`):**
+- **Galdrakarl (mage)** — +50% XP fyrir Plan Mode
+- **Skipanavaldur (hacker)** — +20% XP fyrir Skills (m2-*)
+- **Hraðamaður (speed)** — +1 streak shield á viku
+- **Kanninn (explorer)** — AI svör gefa +5 XP bónus
+
+Buff hooks eru í `markDone()` og `askAI()` í `App.jsx`.
+
+**Skjáir (5 tabs):**
+1. **Heim** — Hero (næsta lexía) + Class card + Streak + Stage select grid
+2. **Áfangar** — Course cards með lesson rows
+3. **Lestur** — Virk lexía (read type) með renderLessonContent
+4. **Verkefni** — Virk áskorun (challenge type) sem "Boss fight" + AI partner
+5. **CLAUDE.md** — Generator (sömu virkni og áður, endurstílað)
+
+**Litaheppni — 6 paletta:** `getPalette({dark, warmth})` í `lib/theme.js` skilar einum af 6 (light/dark × cool/neutral/warm). Stillingar geymdar í `localStorage.cc_tweaks`.
 
 ---
 
@@ -236,6 +260,9 @@ btn: (color) => ({
 // Lyklar sem eru notaðir:
 "cc_completed"  // JSON object: { "m1-l1": true, "m1-l2": true, ... }
 "cc_xp"         // Number sem strengur: "150"
+"cc_class"      // String: "mage" | "hacker" | "speed" | "explorer"
+"cc_tweaks"     // JSON: { dark, intensity, motion, warmth }
+"cc_streak"     // JSON: { count, lastDay }
 
 // ALDREI geyma:
 // - Persónulegar upplýsingar
