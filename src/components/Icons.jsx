@@ -197,14 +197,55 @@ export const I = {
       <path d="M14 2v6h6M8 13h8M8 17h6" />
     </svg>
   ),
+  monitor: ({ size = 20, ...p }) => (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...p}
+    >
+      <rect x="2" y="3" width="20" height="14" rx="2" />
+      <path d="M8 21h8M12 17v4" />
+    </svg>
+  ),
+  branch: ({ size = 20, ...p }) => (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...p}
+    >
+      <circle cx="6" cy="5" r="2" />
+      <circle cx="6" cy="19" r="2" />
+      <circle cx="18" cy="12" r="2" />
+      <path d="M6 7v10M6 12c0-3 4-5 9-5h1" />
+    </svg>
+  ),
 };
 
 export const moduleIcons = {
-  m1: "zap",
-  m2: "slash",
-  m3: "nodes",
-  m4: "gear",
-  m5: "agents",
+  m1: "monitor",
+  m2: "terminal",
+  m3: "branch",
+  m4: "sparkle",
+  m5: "play",
+  m6: "slash",
+  m7: "bolt",
+  m8: "doc",
+  m9: "eye",
+  m10: "gear",
+  m11: "agents",
+  m12: "trophy",
 };
 
 export function PixelChar({ grid, palette, size = 64 }) {
