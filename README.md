@@ -30,13 +30,15 @@ ANTHROPIC_API_KEY=sk-ant-...
 
 Innskráning og þvert-á-tæki vistun gangast fyrir með **Netlify Identity**.
 
-1. Sendu verkefnið á Netlify (drag-and-drop í [app.netlify.com/drop](https://app.netlify.com/drop) eða tengdu Git repo).
-2. Í Netlify dashboard → **Site configuration → Identity** → **Enable Identity**.
-3. Stilltu **Registration** á `Open` eða `Invite only` eftir hvað þú vilt.
-4. Afritaðu slóðina á síðuna (t.d. `https://your-site.netlify.app`) og settu í `.env`:
-   ```
-   VITE_NETLIFY_SITE_URL=https://your-site.netlify.app
-   ```
+Síðan er hostuð á: **https://claudenamskeid.netlify.app**
+
+Fyrir local dev þarf eftirfarandi í `.env`:
+
+```
+VITE_NETLIFY_SITE_URL=https://claudenamskeid.netlify.app
+```
+
+Identity er nú þegar virkjað á síðunni — engin frekari uppsetning þarf.
 
 > Í Netlify production þarf ekki að setja `VITE_NETLIFY_SITE_URL` — widgetinn finnur Identity sjálfkrafa. Aðeins í local dev.
 
