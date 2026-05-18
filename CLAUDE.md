@@ -20,7 +20,8 @@
 - **Stíll:** Tailwind CSS v4 (`@tailwindcss/vite`) fyrir base, inline `<style>` template literal í `App.jsx` fyrir dynamic palette/theme styles
 - **Letur:** Space Grotesk (body), VT323 (accents/counters), JetBrains Mono (code) frá Google Fonts
 - **API:** Anthropic Messages API (`claude-sonnet-4-20250514`) gegnum Vite proxy
-- **Geymsla:** localStorage fyrir XP, framvindu, streak, class, tweaks
+- **Auth:** Netlify Identity widget — innskráning krafist til að opna appið
+- **Geymsla:** Netlify Identity `user_metadata.cc_progress` (cross-device), localStorage sem cache
 - **Þjónustuveri:** Vite dev server með proxy fyrir API (API lykill aldrei í vafra)
 
 ### Skráauppbygging
@@ -29,6 +30,7 @@ claude-code-namskeid/
 ├── index.html              # Vite entry + Google Fonts
 ├── package.json
 ├── vite.config.js          # Vite + Tailwind + /api/messages proxy
+├── netlify.toml            # Netlify build config + SPA redirects
 ├── .env.example            # Sniðmát (notandi býr til .env)
 ├── .gitignore
 ├── CLAUDE.md               # Þessi skrá
@@ -43,9 +45,11 @@ claude-code-namskeid/
     │   └── classes.js      # CLASSES — 4 pixel-art persónugerðir með buffs
     ├── lib/
     │   ├── theme.js        # getPalette({dark, warmth}) — 6 paletta
-    │   └── api.js          # callAnthropic + system prompts
+    │   ├── api.js          # callAnthropic + system prompts
+    │   └── auth.js         # Netlify Identity wrapper + user_metadata sync
     └── components/
-        └── Icons.jsx       # I (SVG iconset) + moduleIcons + PixelChar
+        ├── Icons.jsx       # I (SVG iconset) + moduleIcons + PixelChar
+        └── LoginScreen.jsx # Innskráningarskjár
 ```
 
 ### Námsskrá (12 módúl, ~60 lessons)
@@ -220,6 +224,39 @@ Hjálparfall `callAnthropic({ system, userContent })` í `src/App.jsx` sér um �
 
 ---
 
+## Auth — Netlify Identity
+
+### Yfirlit
+Appið er gated á bak við innskráningu. Notandi sér `LoginScreen` þangað til hann skráir sig inn í gegnum Netlify Identity widget (modal poppar upp).
+
+### Flæði
+1. `App` mountast → `initAuth()` setur upp widget með `APIUrl` ef `VITE_NETLIFY_SITE_URL` er sett
+2. Ef notandi var áður innskráður → `getUser()` skilar honum → `hydrateFromUserData()` hleður `user.user_metadata.cc_progress` í state
+3. Ef ekki innskráður → `LoginScreen` birtist, notandi smellir á "Búa til reikning" eða "Skrá inn" → Netlify Identity widget poppar upp
+4. Eftir innskráningu → `onLogin` event → state hydratað og appið birtist
+5. Allar state breytingar (xp, completed, streak, classId, tweaks) trigga `saveUserData()` sem skrifar debounced í `user.user_metadata.cc_progress` (1.5s)
+6. localStorage er enn skrifað í (sem cache fyrir hraða og offline)
+7. Logout takki er í Tweaks panel (botn-hægri)
+
+### Storage layout
+```js
+user.user_metadata.cc_progress = {
+  xp: 150,
+  completed: { "m1-l1": true, ... },
+  streak: { count: 5, lastDay: "2026-05-18" },
+  classId: "mage",
+  tweaks: { dark: false, intensity: 1, motion: true, warmth: 1 },
+  updatedAt: "2026-05-18T15:00:00Z"
+}
+```
+
+### Mikilvægt
+- Bætirðu við nýju persistent state? Settu það líka inn í `hydrateFromUserData()` og í payload í `saveUserData(...)` kallinu (í `useEffect` sem hlustar á state)
+- `flushUserData()` keyrir á `beforeunload` og logout — passar að nýjustu breytingar séu vistaðar
+- `VITE_NETLIFY_SITE_URL` í `.env` er aðeins fyrir local dev. Á Netlify production er widget sjálfvirkur
+
+---
+
 ## UX og hönnunarreglur
 
 ### ADHD-vinsamleg hönnun (MIKILVÆGT)
@@ -272,7 +309,13 @@ btn: (color) => ({
 
 ---
 
-## Geymsla (localStorage)
+## Geymsla
+
+### Aðallag — Netlify Identity user_metadata
+Authoritative geymsla fyrir framvindu er `user.user_metadata.cc_progress` (sjá `Auth` kafla). Þetta gerir cross-device sync sjálfvirkan.
+
+### Cache lag — localStorage
+localStorage er notað sem cache (hraðari fyrsta render + offline). Sömu lyklar eru skrifaðir samhliða:
 
 ```js
 // Lyklar sem eru notaðir:

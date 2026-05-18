@@ -1,0 +1,13 @@
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+[dev]
+  framework = "vite"
+  targetPort = 5173
+
+# SPA fallback — allt sem er ekki skrá fer í index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
