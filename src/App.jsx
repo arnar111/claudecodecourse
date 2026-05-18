@@ -275,11 +275,14 @@ export default function App() {
     let label = lesson.type === "challenge" ? "Verkefni klárað" : "Lestur lokið";
 
     // Class buffs
-    if (classId === "mage" && lesson.title.toLowerCase().includes("plan mode")) {
+    if (
+      classId === "mage" &&
+      (lesson.id.startsWith("m9-") || lesson.title.toLowerCase().includes("plan mode"))
+    ) {
       earned = Math.round(earned * 1.5);
       label = "Plan Mode +50%";
     }
-    if (classId === "hacker" && lesson.id.startsWith("m2-")) {
+    if (classId === "hacker" && lesson.id.startsWith("m7-")) {
       earned = Math.round(earned * 1.2);
       label = "Skills +20%";
     }

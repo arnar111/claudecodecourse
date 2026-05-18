@@ -38,7 +38,8 @@ claude-code-namskeid/
     ├── App.jsx             # Aðalapp — router + screens + inline styles
     ├── index.css           # Tailwind + base fonts
     ├── data/
-    │   ├── modules.js      # MODULES array með lesson content
+    │   ├── modules.js      # Importar m1-m12, exportar MODULES + TOTAL_*
+    │   ├── modules/        # 12 módúl, eitt á skrá (m1.js ... m12.js)
     │   └── classes.js      # CLASSES — 4 pixel-art persónugerðir með buffs
     ├── lib/
     │   ├── theme.js        # getPalette({dark, warmth}) — 6 paletta
@@ -47,12 +48,29 @@ claude-code-namskeid/
         └── Icons.jsx       # I (SVG iconset) + moduleIcons + PixelChar
 ```
 
+### Námsskrá (12 módúl, ~60 lessons)
+
+| ID | Titill | Lessons | Mín | Hlutverk |
+|----|--------|---------|-----|----------|
+| m1 | Tölvugrunnur | 4 | 14 | Tölvur, stýrikerfi, skrár |
+| m2 | Terminal og skipanir | 5 | 19 | ls, cd, grep, find |
+| m3 | Git — versions stjórnun | 5 | 24 | init, commit, branch, GitHub |
+| m4 | AI og Claude | 4 | 14 | LLM, Claude family |
+| m5 | Að keyra Claude Code | 6 | 28 | Uppsetning, permission modes |
+| m6 | Slash Commands | 6 | 26 | /clear, /init, /context, /model |
+| m7 | Skills — Eigin skipanir | 5 | 25 | Frontmatter, description, global vs project |
+| m8 | CLAUDE.md djúpt | 5 | 22 | Hvar, hvað, @ mentions |
+| m9 | Plan Mode | 4 | 18 | Shift+Tab, lesa plan |
+| m10 | Hooks og sjálfvirkni | 5 | 25 | PreToolUse, PostToolUse, Stop |
+| m11 | MCP — Ytri verkfæri | 5 | 26 | GitHub MCP, Playwright |
+| m12 | Pro workflows | 5 | 30 | Subagents, deploy, testing |
+
 ### Útlit — "Arcade Soft" hönnun
 ADHD-vinsamleg gamification: pixel-art persónugerðir með buffs, soft sunset palette, combo bursts, og Tweaks panel (Intensity/Motion/Warmth).
 
 **Persónugerðir (`src/data/classes.js`):**
-- **Galdrakarl (mage)** — +50% XP fyrir Plan Mode
-- **Skipanavaldur (hacker)** — +20% XP fyrir Skills (m2-*)
+- **Galdrakarl (mage)** — +50% XP fyrir Plan Mode (m9-* eða titill inniheldur "plan mode")
+- **Skipanavaldur (hacker)** — +20% XP fyrir Skills módúl (m7-*)
 - **Hraðamaður (speed)** — +1 streak shield á viku
 - **Kanninn (explorer)** — AI svör gefa +5 XP bónus
 
@@ -277,15 +295,26 @@ btn: (color) => ({
 ## Þegar þú bætir við efni
 
 ### Bæta við lesson í núverandi module
-1. Bæta nýjum `lesson` hlut við `lessons` array í réttum module
-2. Gefðu einstakt `id` á forminu `mX-lY`
-3. Veldu `type: "read"` eða `type: "challenge"`
-4. Settu hæfilegt `xp`: read=10-20, challenge=30-60 eftir erfiðleika
+1. Opnaðu `src/data/modules/mX.js` fyrir viðkomandi módúl
+2. Bættu nýjum `lesson` hlut við `lessons` array
+3. Gefðu einstakt `id` á forminu `mX-lY`
+4. Veldu `type: "read"` eða `type: "challenge"`
+5. Settu hæfilegt `xp`: read=10-20, challenge=30-60 eftir erfiðleika
+6. Uppfærðu `minutes` í module header ef þörf
 
 ### Bæta við nýjum module
-1. Bæta nýjum hlut við `MODULES` array
+1. Búðu til nýja skrá `src/data/modules/mN.js`
 2. Veldu nýjan `accent` lit (sem er ekki þegar notaður)
-3. Sidebar og navigation eru **sjálfkrafa uppfærð** — ekkert annað þarf að breyta
+3. Importaðu og bættu við í `src/data/modules.js`:
+   ```js
+   import { mN } from "./modules/mN.js";
+   export const MODULES = [..., mN];
+   ```
+4. Bættu icon mapping við í `src/components/Icons.jsx`:
+   ```js
+   export const moduleIcons = { ..., mN: "iconName" };
+   ```
+5. Sidebar og navigation eru **sjálfkrafa uppfærð** — ekkert annað þarf að breyta
 
 ### Bæta við nýjum view (flipi)
 1. Bæta nýrri `view` gildi við state (`useState("course")`)
