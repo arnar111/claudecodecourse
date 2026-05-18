@@ -26,13 +26,27 @@ ANTHROPIC_API_KEY=sk-ant-...
 
 > ⚠️ `.env` er í `.gitignore` — aldrei commita hann.
 
-### 3. Keyra dev server
+### 3. Setja upp Netlify Identity (innskráning)
+
+Innskráning og þvert-á-tæki vistun gangast fyrir með **Netlify Identity**.
+
+1. Sendu verkefnið á Netlify (drag-and-drop í [app.netlify.com/drop](https://app.netlify.com/drop) eða tengdu Git repo).
+2. Í Netlify dashboard → **Site configuration → Identity** → **Enable Identity**.
+3. Stilltu **Registration** á `Open` eða `Invite only` eftir hvað þú vilt.
+4. Afritaðu slóðina á síðuna (t.d. `https://your-site.netlify.app`) og settu í `.env`:
+   ```
+   VITE_NETLIFY_SITE_URL=https://your-site.netlify.app
+   ```
+
+> Í Netlify production þarf ekki að setja `VITE_NETLIFY_SITE_URL` — widgetinn finnur Identity sjálfkrafa. Aðeins í local dev.
+
+### 4. Keyra dev server
 
 ```bash
 npm run dev
 ```
 
-Opnaðu http://localhost:5173 í vafranum.
+Opnaðu http://localhost:5173 í vafranum og skráðu þig inn.
 
 ## Skipanir
 
@@ -59,14 +73,19 @@ claude-code-namskeid/
 ├── index.html              # Vite entry HTML
 ├── package.json
 ├── vite.config.js          # Vite + Tailwind + API proxy
+├── netlify.toml            # Netlify build + SPA redirects
 ├── .env.example            # Sniðmát fyrir umhverfisbreytur
 ├── .gitignore
 ├── CLAUDE.md               # Leiðbeiningar fyrir Claude Code
 ├── README.md               # Þessi skrá
 └── src/
     ├── main.jsx            # React entry point
-    ├── App.jsx             # Aðalapp (allt í einu enn sem komið er)
-    └── index.css           # Tailwind import + animations
+    ├── App.jsx             # Aðalapp
+    ├── index.css           # Tailwind import + animations
+    ├── components/
+    │   └── LoginScreen.jsx # Innskráningarskjár (Netlify Identity)
+    └── lib/
+        └── auth.js         # Netlify Identity wrapper + user_metadata sync
 ```
 
 ## Tækni
@@ -75,7 +94,8 @@ claude-code-namskeid/
 - **Vite 6** sem build tool
 - **Tailwind CSS v4** fyrir stíla
 - **Anthropic Messages API** (`claude-sonnet-4-20250514`)
-- **localStorage** fyrir XP og framvindu
+- **Netlify Identity** fyrir innskráningu (cross-device sync í `user_metadata`)
+- **localStorage** sem cache fyrir XP og framvindu
 
 ## Leiðbeiningar fyrir efnisbreytingar
 

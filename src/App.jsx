@@ -2,8 +2,20 @@ import { useState, useRef, useEffect } from "react";
 import { MODULES, TOTAL_XP, TOTAL_LESSONS } from "./data/modules";
 import { CLASSES } from "./data/classes";
 import { I, moduleIcons, PixelChar } from "./components/Icons";
+import LoginScreen from "./components/LoginScreen";
 import { getPalette, getShadowScale, alphaHex } from "./lib/theme";
 import { callAnthropic, TEACHER_SYSTEM_PROMPT, CLAUDEMD_SYSTEM_PROMPT } from "./lib/api";
+import {
+  initAuth,
+  getUser,
+  openLogin,
+  openSignup,
+  logout as doLogout,
+  onAuthChange,
+  loadUserData,
+  saveUserData,
+  flushUserData,
+} from "./lib/auth";
 
 // ── Storage helpers ──────────────────────────────────────────────────────────
 
@@ -148,6 +160,10 @@ function findLessonById(id) {
 // ── Main App ─────────────────────────────────────────────────────────────────
 
 export default function App() {
+  // Auth
+  const [user, setUser] = useState(null);
+  const hydratedRef = useRef(false);
+
   // Navigation
   const [screen, setScreen] = useState("home");
   const [activeLessonId, setActiveLessonId] = useState(null);
@@ -176,6 +192,65 @@ export default function App() {
     safeGet("cc_streak", { count: 0, lastDay: null })
   );
   const [streakShield, setStreakShield] = useState(false);
+
+  // ── Auth bootstrap ────────────────────────────────────────────────────────
+  useEffect(() => {
+    initAuth();
+    const current = getUser();
+    if (current) {
+      setUser(current);
+      hydrateFromUserData();
+    }
+    const off = onAuthChange({
+      onInit: (u) => {
+        if (u) {
+          setUser(u);
+          hydrateFromUserData();
+        }
+      },
+      onLogin: (u) => {
+        setUser(u);
+        hydrateFromUserData();
+      },
+      onLogout: () => {
+        setUser(null);
+        hydratedRef.current = false;
+      },
+    });
+    return () => off();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function hydrateFromUserData() {
+    const data = loadUserData();
+    if (!data) {
+      hydratedRef.current = true;
+      return;
+    }
+    if (typeof data.xp === "number") {
+      setXp(data.xp);
+      setDisplayXp(data.xp);
+    }
+    if (data.completed && typeof data.completed === "object") {
+      setCompleted(data.completed);
+    }
+    if (data.streak && typeof data.streak === "object") {
+      setStreak(data.streak);
+    }
+    if (typeof data.classId === "string") setClassId(data.classId);
+    if (data.tweaks && typeof data.tweaks === "object") {
+      if (typeof data.tweaks.dark === "boolean") setDark(data.tweaks.dark);
+      if (typeof data.tweaks.intensity === "number")
+        setIntensity(data.tweaks.intensity);
+      if (typeof data.tweaks.motion === "boolean") setMotion(data.tweaks.motion);
+      if (typeof data.tweaks.warmth === "number") setWarmth(data.tweaks.warmth);
+    }
+    hydratedRef.current = true;
+  }
+
+  function handleLogout() {
+    flushUserData().finally(() => doLogout());
+  }
 
   // Transient FX
   const [combo, setCombo] = useState(null); // { xp, label }
@@ -209,6 +284,28 @@ export default function App() {
   useEffect(() => safeSet("cc_completed", completed), [completed]);
   useEffect(() => safeSet("cc_xp", xp), [xp]);
   useEffect(() => safeSet("cc_streak", streak), [streak]);
+
+  // Sync to Netlify Identity user_metadata when logged in (debounced inside saveUserData)
+  useEffect(() => {
+    if (!user || !hydratedRef.current) return;
+    saveUserData({
+      xp,
+      completed,
+      streak,
+      classId,
+      tweaks: { dark, intensity, motion, warmth },
+      updatedAt: new Date().toISOString(),
+    });
+  }, [user, xp, completed, streak, classId, dark, intensity, motion, warmth]);
+
+  // Flush pending writes on unload
+  useEffect(() => {
+    const handler = () => {
+      flushUserData();
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, []);
 
   // Reset transient state when changing screen or lesson
   useEffect(() => {
@@ -733,6 +830,10 @@ code.arc2-kbd { font-family: 'JetBrains Mono', monospace; background: ${C.panelA
 
   const heroLesson = next;
   const bossHpPct = activeLesson && completed[activeLesson.lesson.id] ? 0 : 82;
+
+  if (!user) {
+    return <LoginScreen palette={C} onLogin={openLogin} onSignup={openSignup} />;
+  }
 
   return (
     <div className="arc2">
@@ -1500,6 +1601,48 @@ code.arc2-kbd { font-family: 'JetBrains Mono', monospace; background: ${C.panelA
                 {l}
               </button>
             ))}
+          </div>
+          <div
+            style={{
+              marginTop: 12,
+              paddingTop: 12,
+              borderTop: `1px dashed ${C.line}`,
+            }}
+          >
+            <div
+              className="arc2-tweak-label"
+              style={{ marginBottom: 6, color: C.inkSoft }}
+            >
+              Skráð(ur) inn sem
+            </div>
+            <div
+              style={{
+                fontSize: 12,
+                color: C.ink,
+                marginBottom: 8,
+                wordBreak: "break-all",
+                lineHeight: 1.4,
+              }}
+            >
+              {user.email || user.user_metadata?.full_name || "—"}
+            </div>
+            <button
+              onClick={handleLogout}
+              style={{
+                width: "100%",
+                padding: "7px 10px",
+                fontSize: 12,
+                background: C.panelAlt,
+                border: `1px solid ${C.line}`,
+                color: C.ink,
+                cursor: "pointer",
+                borderRadius: 8,
+                fontFamily: "inherit",
+                fontWeight: 600,
+              }}
+            >
+              Skrá út
+            </button>
           </div>
         </div>
       ) : (
